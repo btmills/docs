@@ -44,13 +44,15 @@ def read_index(script_path, result):
             # We just found a new title, let's save the previous one (if defined)
             if current_method != None:
                 # The key used is the url of the detailed page about the method
+                # markdown.markdown doesn't properly parse code if there are multiple lines or `>`
                 result["api/javascript/"+current_url+"/"] = {
                     "description": markdown.markdown(current_description),
                     "url":  current_url,
                     "body": current_body,
                     "name": current_method,
-                    "example": markdown.markdown(current_example.replace('```js', '```'))
+                    "example": markdown.markdown(re.sub(r'\n+', '\n', re.sub(r'```\n> ', '```\n', current_example.replace('```js', '```'))))
                 }
+
             current_method = title.group(1)
             current_url = title.group(2)
             current_description = ""
