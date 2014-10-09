@@ -1,31 +1,34 @@
 #!/bin/zsh
-docsets=("reql-js")
+docsets=(javascript python ruby)
 
 command -v pandoc >/dev/null 2>&1 || {
     echo >&2 "pandoc must be installed and on path ('brew install pandoc'?)";
     exit 1;
 }
 
+rm -rf build
+
 for docset in $docsets; do
 
     echo "starting $docset - copying assets"
-    mkdir -p build/$docset.docset/Contents/Resources/Documents/images
-    cp rethinkdb.css build/$docset.docset/Contents/Resources/Documents
-    cp $docset.plist build/$docset.docset/Contents/Info.plist
-    cp icon.png build/$docset.docset/icon.png
+    mkdir -p build/reql-$docset.docset/Contents/Resources/Documents/images
+    cp rethinkdb.css build/reql-$docset.docset/Contents/Resources/Documents
+    cp $docset.plist build/reql-$docset.docset/Contents/Info.plist
+    cp icon.png build/reql-$docset.docset/icon.png
     cp ../_images/api_illustrations/* \
-        build/$docset.docset/Contents/Resources/Documents/images
+        build/reql-$docset.docset/Contents/Resources/Documents/images
 
-    db="build/$docset.docset/Contents/Resources/docSet.dsidx"
+    db="build/reql-$docset.docset/Contents/Resources/docSet.dsidx"
     sqlite3 -line $db 'DROP TABLE IF EXISTS searchIndex;
         CREATE TABLE searchIndex(id INTEGER PRIMARY KEY, name TEXT, type TEXT, path TEXT);
         CREATE UNIQUE INDEX anchor ON searchIndex (name, type, path);'
 
     echo "building HTML files and index"
-    for doc in ../api/javascript/**/*.md; do
-        command=`sed -E -n "s/^command:[[:space:]]*(.*)/\1/p" $doc`
+    for doc in ../api/$docset/**/*.md; do
+        command=`sed -E -n -e "s/['\"]//g" -e "s/^command:[[:space:]]*(.*)/\1/p" \
+            -e "/#/q" $doc`
         sed -E -f commands.sed $doc | \
-        pandoc -o build/$docset.docset/Contents/Resources/Documents/${doc:t:r}.html \
+        pandoc -o build/reql-$docset.docset/Contents/Resources/Documents/${doc:t:r}.html \
             -t html5 -s --template=template.html
         values="('$command', 'Command', '${doc:t:r}.html')"
         if [[ -n $command ]]; then
