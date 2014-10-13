@@ -2601,9 +2601,7 @@ r.table('geo').get(201).update({
 r.geojson(geojson) &rarr; geometry
 {% endapibody %}
 
-Convert a [GeoJSON][] object to a ReQL geometry object.
-
-[GeoJSON]: http://geojson.org
+Convert a [GeoJSON](http://geojson.org) object to a ReQL geometry object.
 
 __Example:__ Convert a GeoJSON object to a ReQL geometry object.
 
