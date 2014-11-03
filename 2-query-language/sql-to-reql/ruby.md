@@ -3,17 +3,15 @@ layout: documentation
 title: SQL to ReQL cheat sheet
 active: docs
 docs_active: sql-to-reql
-permalink: docs/sql-to-reql/
+permalink: docs/sql-to-reql/python/
+switcher: true
+language: Python
 ---
 
 <img alt="Data Modeling Illustration" class="api_command_illustration"
     src="/assets/images/docs/api_illustrations/SQL-to-ReQL-cheat-sheet.png" />
 
 &nbsp;
-
-{% infobox info %}
-__Note:__ Examples below are in Python. Head to the [API reference](/api/) to see the commands in other languages.
-{% endinfobox %}
 
 # Terminology #
 
@@ -1047,7 +1045,7 @@ r.<a href="/api/python/table_create/">table_create</a>('users', primary_key="id"
 <p><em>Note:</em> RethinkDB is a NoSQL database and does not enforce
 schemas.</p>
 
-<p><em>Note²:</em> The default primary key is <code>id</code></p>
+<p><em>Note:</em> The default primary key is <code>id</code></p>
 
 
 
