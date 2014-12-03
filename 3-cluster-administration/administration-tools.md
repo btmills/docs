@@ -1,6 +1,6 @@
 ---
 layout: documentation
-title: Administration UI
+title: Administration Tools
 active: docs
 docs_active: administration-tools
 permalink: docs/administration-tools/
@@ -8,7 +8,7 @@ alias: docs/guides/administration/
 js: fancybox
 ---
 
-RethinkDB provides a web interface which lets you manage your entire server cluster, from controlling sharding and replication to running ReQL queries (in JavaScript), with editing and history support. In addition, you can perform administration tasks using ReQL with Python or Ruby.
+RethinkDB provides a web interface which lets you manage your entire server cluster, from controlling sharding and replication to running ReQL queries (in JavaScript), with editing and history support. In addition, you can perform administration tasks using scriptable ReQL commands.
 
 # The web interface #
 
@@ -21,11 +21,74 @@ By default, RethinkDB binds the web interface to `localhost` for security reason
 [sc]: /docs/start-a-cluster/
 [cc]: /docs/cluster-on-startup/
 
-# Scripting administration tasks #
+# ReQL administration commands #
 
-If you have the Python or Ruby [client drivers][cd] installed, you can use the Python or Ruby REPL to perform all administration tasks. There are commands for [configuring sharding and replication](/api/python/reconfigure), [rebalancing shards](/api/python/rebalance) and more. In addition, you can query [system tables](/docs/system-tables/) to get information about your cluster and to change many of its operational characteristics.
-
-For more information, read [Scripting RethinkDB][sr].
+With the appropriate [client driver][cd] installed you can use a supported language to perform all administration tasks, either from the language's REPL or as a script. There are ReQL commands for [configuring sharding and replication](/api/python/reconfigure), [rebalancing shards](/api/python/rebalance) and more. In addition, you can query [system tables](/docs/system-tables/) to get information about your cluster and to change many of its operational characteristics.
 
 [cd]: /docs/install-drivers/
-[sr]: /docs/scripting-rethinkdb/
+
+These examples use Python, but there's equivalent functionality in Ruby, and any other scripting language with a RethinkDB driver updated for version 1.16 or later. Read the API documentation for more information on specific commands along with descriptions of their return values.
+
+## Using a REPL ##
+
+Load `python` (or [ipython](http://ipython.org)) and set up a connection to your database:
+
+```py
+import rethinkdb as r
+r.connect('localhost', 28015).repl()
+```
+
+Now, you can use ReQL commands to query system tables and perform reconfiguration commands. To return the server status, you can query the `server_status` system table in the special `rethinkdb` database.
+
+```py
+list(r.db('rethinkdb').table('server_status').run())
+
+[{u'connection': {u'time_connected': datetime.datetime(2014, 11, 26, 21, 26, 15, 694000, tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x101968610>),
+   u'time_disconnected': None},
+  u'id': u'd5211b11-9824-47b1-9f2e-516a999a6451',
+  u'name': u'rethinkdb_local_ym9',
+  u'network': {u'canonical_addresses': [{u'host': u'127.0.0.1',
+     u'port': 29015},
+    {u'host': u'::1', u'port': 29015}],
+   u'cluster_port': 29015,
+   u'hostname': u'rethink.local',
+   u'http_admin_port': 8080,
+   u'reql_port': 28015},
+  u'process': {u'argv': [u'build/release_clang_notcmalloc/rethinkdb'],
+   u'cache_size_mb': 100,
+   u'pid': 38358,
+   u'time_started': datetime.datetime(2014, 11, 26, 21, 26, 15, 690000, tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x1018cdc50>),
+   u'version': u'rethinkdb 1.16.0-1163-g05e545 (CLANG 6.0 (clang-600.0.54))'},
+  u'status': u'available'}]
+```
+
+To return the status on a specific table, you can use the [table_status](/api/python/table_status) command.
+
+```py
+list(r.table_status('superheroes').run())
+```
+
+And reconfiguring a table can be done the [reconfigure](/api/python/reconfigure) command.
+
+```py
+r.table('a').reconfigure(shards=2,replicas=2).run()
+
+r.table('b').reconfigure(shards=2,replicas={'us_east':2, 'us_west':2,
+    'london':2}).run()
+```
+
+The Data Explorer in the web administration UI is itself a JavaScript REPL, with syntax highlighting and history. (The article on [ReQL data exploration][rde] goes into some detail on how to use the Data Explorer.) The advantage of scripting languages with ReQL comes into play when writing administration scripts.
+
+## Scripting ReQL ##
+
+It's easy to script administrative and configuration tasks. Suppose you wanted to change the configuration on all the tables in a database except ones relating to logging:
+
+```py
+import rethinkdb as r
+r.connect('localhost', 28015).repl()
+
+tables = [t for t in r.table_list().run() if 'log_' not in t]
+
+for table in tables:
+    r.table(table).reconfigure(shards=2, replicas=3).run()
+```
