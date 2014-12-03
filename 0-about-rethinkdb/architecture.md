@@ -33,14 +33,14 @@ table's primary key, and cannot be done based on any other attribute
 same thing).
 
 For example, if a given table contains a thousand JSON documents whose
-primary keys are uniformly distributed, alphabetical, upper-case strings and the user states
-they want two shards, RethinkDB will likely pick split point 'M' to
-partition the table. Every document with a primary key less than or
-equal to 'M' will go into the first shard, and every document with a
-primary key greater than 'M' will go into the second shard. The split
-point will be picked such that each shard contains close to five
-hundred keys, and the shards will automatically be distributed across
-the cluster.
+primary keys are uniformly distributed, alphabetical, upper-case strings
+and the user states they want two shards, RethinkDB will likely pick
+split point 'M' to partition the table. Every document with a primary
+key less than or equal to 'M' will go into the first shard, and every
+document with a primary key greater than 'M' will go into the second
+shard. The split point will be picked such that each shard contains
+close to five hundred keys, and the shards will automatically be
+distributed across the cluster.
 
 Even if the primary keys contain unevenly distributed data (such as
 human last names, where some keys are likely to occur much more
@@ -48,6 +48,12 @@ frequently than others), the system will still pick a correct split
 point to ensure that each shard has a roughly similar number of
 documents (there are many more Smiths in the phone book than
 Akhmechets).
+
+Split points will not automatically be changed after table creation,
+which means that if the primary keys are unevenly distributed shards may
+become unbalanced. However, the user can manually rebalance shards when
+necessary, as well as reconfigure tables with new sharding and
+replication settings. Users cannot set split points for shards manually.
 
 In advanced situations, the user can specify the split points
 manually, and the system will partition the table into shards
@@ -63,6 +69,9 @@ commonly used consistent hashing, but it has significant advantages
 because it allows for an efficient implementation of range queries.
 
 ## What governs the location of shards and replicas in the cluster? ##
+
+These are set by _table configurations,_ which specify the 
+
 
 RethinkDB's clustering layer is based on three concepts: goals,
 directory, and blueprints.
