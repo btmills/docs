@@ -81,14 +81,25 @@ The Data Explorer in the web administration UI is itself a JavaScript REPL, with
 
 ## Scripting ReQL ##
 
-It's easy to script administrative and configuration tasks. Suppose you wanted to change the configuration on all the tables in a database except ones relating to logging:
+By using ReQL with a language like Python, it becomes easy to script administrative and configuration tasks with RethinkDB. If you have complex table configurations that might need to be repeated for new tables or tweaked for the whole database, you can store them in a script.
 
 ```py
 import rethinkdb as r
 r.connect('localhost', 28015).repl()
 
-tables = [t for t in r.table_list().run() if 'log_' not in t]
+# Configure the entire database
+r.db('database').reconfigure(shards=2, replicas=3).run()
 
+# Configure a set of specific tables
+tables = ['users', 'posts', 'comments']
+for table in tables:
+    r.table(table).reconfigure(shards=3, replicas=2).run()
+
+# Configure all tables that are not related to logging
+tables = [t for t in r.table_list().run() if 'log_' not in t]
 for table in tables:
     r.table(table).reconfigure(shards=2, replicas=3).run()
+
+# Retrieve the current configuration of all the tables
+config = r.table_status(r.args(r.table_list())).without('status').run()
 ```
