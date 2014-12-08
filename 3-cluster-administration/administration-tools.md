@@ -85,21 +85,31 @@ By using ReQL with a language like Python, it becomes easy to script administrat
 
 ```py
 import rethinkdb as r
-r.connect('localhost', 28015).repl()
+conn = r.connect('localhost', 28015)
 
 # Configure the entire database
-r.db('database').reconfigure(shards=2, replicas=3).run()
+r.db('database').reconfigure(shards=2, replicas=3).run(conn)
 
 # Configure a set of specific tables
 tables = ['users', 'posts', 'comments']
 for table in tables:
-    r.table(table).reconfigure(shards=3, replicas=2).run()
+    r.table(table).reconfigure(shards=3, replicas=2).run(conn)
 
 # Configure all tables that are not related to logging
 tables = [t for t in r.table_list().run() if 'log_' not in t]
 for table in tables:
-    r.table(table).reconfigure(shards=2, replicas=3).run()
+    r.table(table).reconfigure(shards=2, replicas=3).run(conn)
 
 # Retrieve the current configuration of all the tables
-config = r.table_status(r.args(r.table_list())).without('status').run()
+# This uses the table_config system table
+configs = r.db('rethinkdb').table('table_config')
+
+# Restore the configuration of tables saved in 'configs'
+for config in configs:
+    r.db('rethinkdb').table('table_config').get(
+    config['id']).update(config).run(conn)
 ```
+
+Scripting is also the only way to access some advanced features such as server tags, which let you group servers together for replication purposes (such as associating them with physical data centers). For more information, read the "Advanced configuration" section of [Sharding and replication][sr].
+
+[sr]: /docs/sharding-and-replication/
