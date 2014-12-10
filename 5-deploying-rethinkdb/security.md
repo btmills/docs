@@ -139,12 +139,7 @@ authentication key, client drivers will be required to pass the key to the
 server in order to connect.
 
 {% infobox %}
-__Note__: the authentication key will be transmitted to and stored on the
-RethinkDB server in plain text, and neither the key nor the data passed
-between the client and the server will be encrypted. The key provides basic
-protection against unauthorized access, but if the client port is open to
-outside networks it's strongly suggested you use SSH tunneling for protection
-(see below).
+__Note__: The authentication key affects _client drivers,_ not the web interface. Follow the directions above to secure the web UI.
 {% endinfobox %}
 
 Open the Data Explorer in the web administration console and execute the following command:
@@ -171,6 +166,15 @@ r.db('rethinkdb').table('cluster_config').get('auth').update({auth_key: null})
 ```
 
 You can use any ReQL driver for this operation, not just the Data Explorer. Read [Administration tools](/docs/administration-tools/) for more details about scripting RethinkDB administration tasks.
+
+{% infobox %}
+__Note__: the authentication key will be transmitted to and stored on the
+RethinkDB server in plain text, and neither the key nor the data passed
+between the client and the server will be encrypted. The key provides basic
+protection against unauthorized access, but if the client port is open to
+outside networks it's strongly suggested you use SSH tunneling for protection
+(see below).
+{% endinfobox %}
 
 ## Using SSH tunneling ##
 
