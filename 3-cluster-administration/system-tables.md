@@ -6,22 +6,23 @@ docs_active: system-tables
 permalink: docs/system-tables/
 ---
 
-Starting with version 1.16, RethinkDB maintains special *system tables* that can be queried to return status information about servers, databases, individual tables, and issues with the cluster. In addition, some of the fields within these tables can be modified, changing the configuration of the objects they represent.
+Starting with version 1.16, RethinkDB maintains special *system tables* that return status information about servers, databases, individual tables, and issues with the cluster. By inserting or deleting records and updating fields in these tables, the configuration of the objects they represent can be modified.
 
 # Overview #
 
-System tables are accessed through the `rethinkdb` database. This database is automatically created on cluster startup, and system tables cannot be created, dropped, reconfigured, or renamed; these tables aren't real RethinkDB document stores the way user-created tables are, but rather "table-like" interfaces to the system allowing most ReQL commands to be used for control.
+Access the system tables through the `rethinkdb` database. This database is automatically created on cluster startup, and system tables cannot be created, dropped, reconfigured, or renamed. These tables aren't real RethinkDB document stores the way user-created tables are, but rather "table-like" interfaces to the system allowing most ReQL commands to be used for control.
 
 ## The Tables ##
 
-* `table_config` stores information about table configurations, including sharding and replication. Table configurations can be modified through this table, and tables can even be created and deleted.
-* `table_status` is a read-only table which returns the current status and configuration of tables in the system.
-* `server_config` stores information about server names and tags, both of which can be changed by modifying this table. Servers can also be deleted from the cluster.
-* `server_status` is a read-only table that returns the current state of the servers, including uptime, host name, and process ID.
-* `db_config` stores information about databases. Databases can be created, deleted or modified by writing to this table.
-* `issues` reports on various issues that may be affecting the cluster. For details, read the [System issues table][sit] documentation.
-* `jobs` lists the jobs&mdash;queries, index creation, disk compaction, and other utility tasks&mdash;the cluster is spending time on, and also allows queries to be interrupted.
-* `stats` is a read-only table that provides statistics about the cluster.
+* `table_config` stores table configurations, including sharding and replication. By writing to `table_config`, you can create, delete, and reconfigure tables.
+* `server_config` stores server names and tags. By writing to this table you can rename servers, assign them tags, and remove them from the cluster entirely.
+* `db_config` stores database UUIDs and names. By writing to this table, databases can be created, deleted or modified.
+* `cluster_config` stores the authentication key for the cluster.
+* `table_status` is a read-only table which returns the  status and configuration of tables in the system.
+* `server_status` is a read-only table that returns the status of the servers, including uptime, host name, and process ID.
+* `issues` is a read-only table that returns statistics about cluster problems. For details, read the [System issues table][sit] documentation.
+* `jobs` lists the jobs&mdash;queries, index creation, disk compaction, and other utility tasks&mdash;the cluster is spending time on, and also allows you to interrupt running queries.
+* `stats` is a read-only table that returns statistics about the cluster.
 * `logs` contains log files for the cluster.
 
 [sit]: /docs/system-issues/
@@ -29,17 +30,17 @@ System tables are accessed through the `rethinkdb` database. This database is au
 ## Caveats ##
 
 * While system tables support changefeeds, they do not support all of the chaining that real tables do. For instance, aggregation (`max` and `min`) and `limit` commands will not work with system tables.
-* Some system tables are read-only, and the ones that can be written to must be written to in a specific format.
-* Write operations on system tables are non-atomic. You should avoid writing to the same system table row from more than one client at the same time.
-* The `durability` optional argument on writes is ignored for system tables.
+* Some system tables are read-only. System tables which allow writing require specific document schema, described below.
+* Write operations on system tables are non-atomic. Avoid writing to the same system table row from more than one client at the same time.
+* The `durability` argument on writes is ignored for system tables.
 
-The `table` command takes a new optional argument, `identifier_format` (or `identifierFormat` in JavaScript), which can be set to either `name` or `uuid`; when it's set to `uuid`, references in system tables to databases or other tables will be UUIDs rather than database/table names. This is useful for writing scripts and administration tasks, as UUIDs will remain consistent even if object names change. The default is `name`.
+With system tables only, the `table` command takes a new argument, `identifier_format`. Legal values are `name` and `uuid`. When it's set to `uuid`, references in system tables to databases or other tables will be UUIDs rather than database/table names. This is useful for writing scripts and administration tasks, as UUIDs remain consistent even if object names change. The default is `name`.
 
 # Configuration tables #
 
 ## table_config ##
 
-Sharding and replication information can be controlled through the `table_config` table, along with the more advanced settings of write acknowledgements and durability. Tables can also be renamed by modifying their rows. A typical row in the `table_config` table will look like this:
+Sharding and replication can be controlled through the `table_config` table, along with the more advanced settings of write acknowledgements and durability. Tables can also be renamed by modifying their rows. A typical row in the `table_config` table will look like this:
 
 ```js
 {
@@ -56,15 +57,15 @@ Sharding and replication information can be controlled through the `table_config
 }
 ```
 
-* `id`: the UUID of the table.
-* `name`: the name of the table. It can be modified.
+* `id`: the UUID of the table. (Read-only.)
+* `name`: the name of the table.
 * `db`: the database the table is in, either a name or UUID depending on the value of `identifier_format`. It cannot be modified.
-* `primary_key`: the name of the field used as the primary key of the table, set at table creation. It cannot be modified.
+* `primary_key`: the name of the field used as the primary key of the table, set at table creation. (Read-only.)
 * `shards`: a list of the table's shards. Each shard is an object with these fields:
 	* `primary_replica`: the name or UUID of the server acting as the shard's primary. If `primary_replica` is `null` the table will be unavailable. (This may happen if the server acting as the shard's primary is deleted.)
 	* `replicas`: a list of servers, including the director, storing replicas of the shard.
-* `write_acks`: the write acknowledgement settings for the table. If it is set to `majority` (the default), writes will be acknowledged when a majority of replicas have acknowledged their writes; if it is set to `single` it will be acknowledged when a single replica does. This may also be set to a list of requirements (see below).
-* `durability`: `soft` or `hard` (the default). In `hard` durability mode, writes must be committed to disk before write acknowledgements are sent; in `soft` mode, writes are acknowledged immediately upon receipt. The `soft` mode is faster but slightly less resilient to failure.
+* `write_acks`: the write acknowledgement settings for the table. When set to `majority` (the default), writes will be acknowledged when a majority of replicas have acknowledged their writes; when set to `single` writes will be acknowledged when a single replica acknowledges it. This may also be set to a list of requirements; see below.
+* `durability`: `soft` or `hard` (the default). In `hard` durability mode, writes are committed to disk before acknowledgements are sent; in `soft` mode, writes are acknowledged immediately upon receipt. The `soft` mode is faster but slightly less resilient to failure.
 
 If `write_acks` is set to a list of requirements, they should take the form of:
 
@@ -76,17 +77,17 @@ If `write_acks` is set to a list of requirements, they should take the form of:
 ]
 ```
 
-If you `delete` a row from `table_config` the table will be deleted. If you `insert` a row, you must include the `name` and `db` fields; the rest will be automatically generated or set to default. You must *not* include the `id` field--the system will autogenerate a UUID.
+If you `delete` a row from `table_config` the table will be deleted. If you `insert` a row, you must include the `name` and `db` fields; the rest will be automatically generated or set to default. You must *not* include the `id` field--the system will auto-generate a UUID.
 
-If you `replace` a row rather in `table_config` you must include all the fields or an error will be produced. It's usually better to `update` one or more fields.
+If you `replace` a row in `table_config`, you must include all the fields. It's usually easier to `update` specific fields.
 
-Sharding and replication can be controlled through native ReQL commands such as `reconfigure`, and if you're not using server tags, you can change sharding/replication directly from the web UI. Read [Sharding and replication][shrep] for more details.
+Native ReQL commands like `reconfigure` also control sharding and replication, and if you're not using server tags you can change sharding/replication settings in the web UI. Read [Sharding and replication][shrep] for more details.
 
 [shrep]: /docs/sharding-and-replication/
 
 ## server_config ##
 
-This table stores the names of servers along with their *tags.* Server tags are used to organize servers into logical groups: they could be tagged by usage (database, application, etc.), or could be tagged by the data centers they're in ("us_west", "us_east", "london", and so on). For more information on using server tags, read [Sharding and replication][shrep].
+This table stores the names of servers along with their *tags.* Server tags organize servers into logical groups: servers could be tagged by usage (database, application, etc.), or by data center location ("us_west," "us_east," "london," and so on). For more about server tags, read [Sharding and replication][shrep].
 
 Every server that has ever been part of the cluster--and has not been permanently removed--will have a row in this table in the following format.
 
@@ -98,11 +99,11 @@ Every server that has ever been part of the cluster--and has not been permanentl
 }
 ```
 
-* `id`: the UUID of the server.
+* `id`: the UUID of the server. (Read-only.)
 * `name`: the server's name.
-* `tags`: a list of unordered tags assocaited with the server.
+* `tags`: a list of unordered tags associated with the server.
 
-Both `name` and `tags` can be modified. Servers are automatically created with a `default` tag. Documents cannot be inserted into `server_config`; they are inserted automatically when servers connect to the cluster.
+If tags aren't specified when a server starts, the server is automatically assigned the `default` tag. Documents cannot be inserted into `server_config`. A new document gets created when a server connects to the cluster.
 
 Documents *can* be deleted from this table--doing so permanently removes the server from the cluster. When a server is permanently removed from a cluster, the following occurs:
 
@@ -113,7 +114,7 @@ Documents *can* be deleted from this table--doing so permanently removes the ser
 
 ## db_config ##
 
-The `db_config` table is quite simple; one document exists for each database, with only two fields in the document.
+One document exists in `db_config` for each database in the cluster, with only two fields in the document.
 
 ```js
 {
@@ -122,17 +123,17 @@ The `db_config` table is quite simple; one document exists for each database, wi
 }
 ```
 
-* `id`: the UUID of the database.
-* `name`: the name of the database; this can be modified.
+* `id`: the UUID of the database. (Read-only.)
+* `name`: the name of the database.
 
-Documents can be inserted to create new databases, deleted to remove databases, and modified to rename databases. (Renaming databases is the only task that requires modifying the `db_config` table; the other two tasks have native ReQL commands, [dbCreate][dbc] and [dbDrop][dbd].) As with tables, if you `insert` a database, don't include the `id` field: the system will autogenerate the UUID.
+Documents can be inserted to create new databases, deleted to remove databases, and modified to rename databases. (Renaming databases is the only task that requires querying the `db_config` table; the other two tasks have native ReQL commands, [dbCreate][dbc] and [dbDrop][dbd].) As with tables, if you `insert` a database, don't include the `id` field: the system will auto-generate the UUID.
 
 [dbc]: /api/javascript/db_create
 [dbd]: /api/javascript/db_drop
 
 ## cluster_config ##
 
-The `cluster_config` table is even simpler than `db_config`; currently there's only one thing that can be changed, the [authentication key][auth]. This table always has exactly one row. Documents cannot be inserted into or deleted from this table.
+The `cluster_config` table is even simpler than `db_config`; only one thing can be changed, the [authentication key][auth]. This table always has exactly one row. Documents cannot be inserted into or deleted from this table.
 
 [auth]: /docs/security/
 
@@ -144,11 +145,11 @@ The `cluster_config` table is even simpler than `db_config`; currently there's o
 ```
 
 * `id`: the primary key, always `auth`.
-* `auth_key`: the authentication key, or `null` if no key has been set.
+* `auth_key`: the authentication key, or `null` if no key is set.
 
-Updating the `auth_key` field is the only way to set or change the cluster authentication key. Read [Securing your cluster][auth] for more information about what this is and why you might want to set it.
+Updating the `auth_key` field is the only way to set or change the cluster authentication key. Read [Securing your cluster][auth] to learn about the key and why you might want to set it.
 
-The `auth_key` field is unusual in that it is a *write-only* field. If you try to read its value, you will get `null` or `{hidden: true}` but will not see the actual key if it's been set.
+The `auth_key` field is unusual in that it is a *write-only* field. If you try to read its value, you will get `null` or `{hidden: true}` but will not see the actual key.
 
 # Status tables #
 
@@ -201,7 +202,7 @@ This table stores information about table availability. There is one document pe
 
 This table returns information about the status and availability of servers within a RethinkDB cluster. There is one document per server that's ever been connected to the cluster and not permanently removed.
 
-This is a typical document schema for a server that's currently connected to the host server--that is, the server the client's connecting to when they query the `server_status` table. If a server is *not* connected to the host server there will be differences noted below.
+This is a typical document schema for a server connected to the host server--that is, the server the client's connecting to when they query the `server_status` table. If a server is *not* connected to the host server there will be differences noted below.
 
 ```js
 {
