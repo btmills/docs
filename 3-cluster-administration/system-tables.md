@@ -261,6 +261,10 @@ If the server is not connected to the host server:
 
 ## stats ##
 
+The `stats` table provides statistics about server read/write throughput, client connections, and memory usage. For details, read the [System stats table][sst] documentation.
+
+[sst]: /docs/system-stats/
+
 ## jobs ##
 
 ## issues ##
