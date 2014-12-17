@@ -43,23 +43,18 @@ Now, you can use ReQL commands to query system tables and perform reconfiguratio
 ```py
 list(r.db('rethinkdb').table('server_status').run())
 
-[{u'connection': {u'time_connected': datetime.datetime(2014, 11, 26, 21, 26, 15, 694000, tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x101968610>),
-   u'time_disconnected': None},
-  u'id': u'd5211b11-9824-47b1-9f2e-516a999a6451',
-  u'name': u'rethinkdb_local_ym9',
-  u'network': {u'canonical_addresses': [{u'host': u'127.0.0.1',
-     u'port': 29015},
-    {u'host': u'::1', u'port': 29015}],
-   u'cluster_port': 29015,
-   u'hostname': u'rethink.local',
-   u'http_admin_port': 8080,
-   u'reql_port': 28015},
-  u'process': {u'argv': [u'build/release_clang_notcmalloc/rethinkdb'],
-   u'cache_size_mb': 100,
-   u'pid': 38358,
-   u'time_started': datetime.datetime(2014, 11, 26, 21, 26, 15, 690000, tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x1018cdc50>),
-   u'version': u'rethinkdb 1.16.0-1163-g05e545 (CLANG 6.0 (clang-600.0.54))'},
-  u'status': u'available'}]
+[{u'status': u'available', u'network': {u'canonical_addresses': [{u'host':
+u'127.0.0.1', u'port': 29015}, {u'host': u'::1', u'port': 29015}],
+u'http_admin_port': 8080, u'hostname': u'rethinkdb.local', u'cluster_port':
+29015, u'reql_port': 28015}, u'process': {u'version': u'rethinkdb
+1.15.2-1425-gad513b (CLANG 6.0 (clang-600.0.56))', u'pid': 69596,
+u'cache_size_mb': 100, u'argv': [u'./build/release_clang/rethinkdb'],
+u'time_started': datetime.datetime(2014, 12, 12, 22, 43, 56, 651000,
+tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x10c13d1d0>)}, u'connection':
+{u'time_connected': datetime.datetime(2014, 12, 12, 22, 43, 56, 654000,
+tzinfo=<rethinkdb.ast.RqlTzinfo object at 0x10c13d250>), u'time_disconnected':
+None}, u'id': u'6dbc31fe-8f78-4128-af76-cdac43bcc195', u'name':
+u'rethinkdb_local_qpp'}]
 ```
 
 To return the status on a specific table, you can use the [table_status](/api/python/table_status) command.

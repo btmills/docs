@@ -6,11 +6,13 @@ docs_active: system-tables
 permalink: docs/system-tables/
 ---
 
-Starting with version 1.16, RethinkDB maintains special *system tables* that return status information about servers, databases, individual tables, and issues with the cluster. By inserting or deleting records and updating fields in these tables, the configuration of the objects they represent can be modified.
+Starting with version 1.16, RethinkDB maintains special *system tables* that contain configuration and status information about servers, databases, individual tables, and issues with the cluster. Querying system tables returns information about the status of the cluster and current objects (such as servers and tables) within the cluster. By inserting or deleting records and updating fields in these tables, the configuration of the objects they represent can be modified.
 
 # Overview #
 
 Access the system tables through the `rethinkdb` database. This database is automatically created on cluster startup, and system tables cannot be created, dropped, reconfigured, or renamed. These tables aren't real RethinkDB document stores the way user-created tables are, but rather "table-like" interfaces to the system allowing most ReQL commands to be used for control.
+
+The metadata in the system tables applies to the RethinkDB cluster as a whole. Each server in a cluster maintains its own copy of the system tables. Whenever a system table on a server changes, the changes are synced across all the servers.
 
 ## The Tables ##
 
@@ -111,6 +113,8 @@ Documents *can* be deleted from this table--doing so permanently removes the ser
 * if it was a replica for a shard, that entry is removed from the shard's `replicas` list;
 * if it was the primary replica for a shard, the `primary_replica` field in that shard's entry becomes `null`;
 * if it was in a list of replicas in the `write_acks` field, it's removed from that list.
+
+Permanently deleting a server is *irreversible:* a deleted server cannot rejoin the cluster, even by restarting the RethinkDB process on that server. You can make a server "new" again by entirely deleting that server's RethinkDB data directory.
 
 ## db_config ##
 
