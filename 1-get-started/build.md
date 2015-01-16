@@ -6,8 +6,13 @@ docs_active: install
 permalink: docs/build/
 ---
 
-These are generic build instructions. Take a look at the [install page](/docs/install/)
-if you are looking for a specific platform.
+RethinkDB provides official packages for [Ubuntu][ubu], [OS X][osx], [CentOS][cen] and [Debian][deb]. Other prebuilt community-supported packages are available at the [install page][ip]. These instructions guide you through building RethinkDB from source.
+
+[ubu]: http://www.rethinkdb.com/docs/install/ubuntu/
+[osx]: http://www.rethinkdb.com/docs/install/osx/
+[cen]: http://www.rethinkdb.com/docs/install/centos/
+[deb]: http://www.rethinkdb.com/docs/install/debian/
+[ip]:  http://www.rethinkdb.com/docs/install/
 
 # Building from source #
 
@@ -37,10 +42,13 @@ curl libcurl3 libcurl4-openssl-dev protobuf-compiler
 
 ## Get the source code ##
 
-Clone the RethinkDB repository:
+Tarballs of the current and all past versions are available at <http://download.rethinkdb.com>. Source distributions are available in the `dist/` directory. Tarballs contain precompiled web assets and some of the dependencies, including the v8 source.
 
-```bash
-git clone --depth 1 -b v{{site.version.major}}.x https://github.com/rethinkdb/rethinkdb.git
+To fetch the latest source tarball, use either `curl` or `wget`:
+
+```sh
+curl -L -O http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
+wget http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
 ```
 
 ## Build the server ##
