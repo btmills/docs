@@ -182,9 +182,9 @@ r.table("users").filter(function(user) {
 
 ## Handling missing fields ##
 
-By default, documents missing fields tested by the `filter` predicate are skipped. In the previous examples, users without an `age` field set are not returned. By passing the optional `default` argument to `filter`, you can change this behavior.
+By default, documents missing fields tested by the `filter` predicate are skipped. In the previous examples, users without an `age` field are not returned. By passing the optional `default` argument to `filter`, you can change this behavior.
 
-__Example:__ Get all users less than 18 years old or whose age is unset (the field `age` is missing).
+__Example:__ Get all users less than 18 years old or whose `age` field is missing).
 
 ```js
 r.table("users").filter(
