@@ -32,17 +32,19 @@ sudo apt-get install rethinkdb
 Install the dependencies:
 
 ```bash
-sudo apt-get install git-core g++ nodejs npm libprotobuf-dev \
-libgoogle-perftools-dev libncurses5-dev libboost-all-dev nodejs-legacy \
-curl libcurl3 libcurl4-openssl-dev protobuf-compiler
+sudo apt-get install build-essential protobuf-compiler python \
+                     libprotobuf-dev libcurl4-openssl-dev \
+                     libboost-all-dev libncurses5-dev \
+                     libjemalloc-dev wget
 ```
 
 ## Get the source code ##
 
-Clone the RethinkDB repository:
+Download and extract the archive:
 
 ```bash
-git clone --depth 1 -b v{{site.version.major}}.x https://github.com/rethinkdb/rethinkdb.git
+wget http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
+tar xf rethinkdb-latest.tgz
 ```
 
 ## Build the server ##
@@ -50,50 +52,7 @@ git clone --depth 1 -b v{{site.version.major}}.x https://github.com/rethinkdb/re
 Kick off the build process:
 
 ```bash
-cd rethinkdb
-./configure --allow-fetch
-make
-```
-
-If you're compiling on a multicore or multiprocessor machine, you may be able to use `make -j #` to speed up the build process, where '#' is the total number of CPU cores. (On a 4-core machine, you can use `make -j 4`.) However, some older versions of `make` will produce a segmentation fault error when using `-j` with RethinkDB; if that happens, just run `make` without the `-j` option.
-
-You'll find the `rethinkdb` binary in the `build/release/` subfolder.
-
-# Compile from source on Ubuntu 12.04 #
-
-## Get the build dependencies ##
-
-Install the main dependencies:
-
-
-```bash
-sudo apt-get install git-core g++ nodejs npm libprotobuf-dev \
-libgoogle-perftools-dev libncurses5-dev libboost-all-dev \
-curl libcurl3 libcurl4-openssl-dev
-```
-
-Then install a more recent version of `node` with `n`.
-
-```
-sudo npm install -g n
-sudo apt-get install curl
-sudo n stable
-```
-
-## Get the source code ##
-
-Clone the RethinkDB repository:
-
-```bash
-git clone --depth 1 -b v{{site.version.major}}.x https://github.com/rethinkdb/rethinkdb.git
-```
-
-## Build the server ##
-
-Kick off the build process:
-
-```bash
-cd rethinkdb
+cd rethinkdb-*
 ./configure --allow-fetch
 make
 ```
