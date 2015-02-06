@@ -18,7 +18,9 @@ These instructions have been tested on OpenSuse 13.1.
 Install the main dependencies:
 
 ```
-sudo zypper in git-core make gcc gcc-c++ protobuf-devel nodejs v8-devel ncurses-devel gperftools-devel boost-devel
+sudo zypper in make gcc gcc-c++ protobuf-devel ncurses-devel \
+               jemalloc-devel boost-devel tar wget m4 which \
+               openssl-devel libcurl-devel
 ```
 
 ## Get the source code ##
@@ -34,8 +36,9 @@ Kick off the build process:
 
 ```
 cd rethinkdb
-./configure --dynamic tcmalloc_minimal
+./configure --dynamic jemalloc
 make
+sudo make install
 ```
 
 {% include install-next-step.md %}
