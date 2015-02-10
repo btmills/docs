@@ -37,7 +37,7 @@ tar xf rethinkdb-latest.tgz
 Kick off the build process:
 
 ```
-cd rethinkdb-*
+cd rethinkdb-{{site.version.full}}
 ./configure --dynamic jemalloc
 make
 sudo make install

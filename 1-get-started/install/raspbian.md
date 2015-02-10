@@ -44,7 +44,7 @@ tar xf rethinkdb-latest.tgz
 Kick off the build process:
 
 ```bash
-cd rethinkdb-*
+cd rethinkdb-{{site.version.full}}
 ./configure --with-system-malloc --allow-fetch
 make
 sudo make install

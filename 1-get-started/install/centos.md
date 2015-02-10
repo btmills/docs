@@ -64,7 +64,7 @@ tar xf rethinkdb-latest.tgz
 Kick off the build process:
 
 ```bash
-cd rethinkdb-*
+cd rethinkdb-{{site.version.full}}
 scl enable devtoolset-2 -- ./configure --dynamic jemalloc --allow-fetch
 scl enable devtoolset-2 -- make
 sudo make install
