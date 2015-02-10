@@ -9,8 +9,7 @@ permalink: docs/install/raspbian/
 {% include install-docs-header.md %}
 {% include install-community-platform-warning.md %}
 
-The following instructions were tested on Raspbian January 2014 (Debian Wheezy).
-They were updated after the 1.16 release, but have not been tested.
+These instructions were updated after the 1.16 release, but have not been tested.
 
 # Compile from source #
 
