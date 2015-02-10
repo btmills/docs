@@ -16,8 +16,8 @@ sudo apt-get install build-essential protobuf-compiler python \
 Download and extract the archive:
 
 ```bash
-wget http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
-tar xf rethinkdb-latest.tgz
+wget http://download.rethinkdb.com/dist/rethinkdb-{{site.version.full}}.tgz
+tar xf rethinkdb-{{site.version.full}}.tgz
 ```
 
 ## Build the server ##

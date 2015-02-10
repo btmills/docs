@@ -83,8 +83,8 @@ You will need to install the `base-devel` group and several additional build dep
 Clone the RethinkDB repository:
 
 ```bash
-$ wget http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
-$ tar xf rethinkdb-latest.tgz
+$ wget http://download.rethinkdb.com/dist/rethinkdb-{{site.version.full}}.tgz
+$ tar xf rethinkdb-{{site.version.full}}.tgz
 ```
 
 ## Build RethinkDB ##

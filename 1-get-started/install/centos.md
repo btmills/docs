@@ -55,8 +55,8 @@ sudo yum install protobuf-devel jemalloc-devel
 Download and extract the source tarball:
 
 ```bash
-wget http://download.rethinkdb.com/dist/rethinkdb-latest.tgz
-tar xf rethinkdb-latest.tgz
+wget http://download.rethinkdb.com/dist/rethinkdb-{{site.version.full}}.tgz
+tar xf rethinkdb-{{site.version.full}}.tgz
 ```
 
 ## Build RethinkDB ##
