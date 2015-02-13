@@ -77,10 +77,10 @@ VALUES ("f62255a8259f",
             </td>
             <td>
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/insert/">insert</a>({
-   "user_id": "f62255a8259f",
-   "age": 30,
-   "name": "Peter"
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/insert/">insert</a>({
+   :user_id => "f62255a8259f",
+   :age => 30,
+   :name => "Peter"
 })
 </pre>
             </td>
@@ -104,7 +104,7 @@ SELECT * FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
+r.<a href="/api/ruby/table/">table</a>("users")
 </pre>
 
         </td></tr>
@@ -115,8 +115,8 @@ SELECT user_id, name FROM users
 </pre>
         </td><td>
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
- .<a href="/api/python/pluck/">pluck</a>("user_id", "name")
+r.<a href="/api/ruby/table/">table</a>("users")
+ .<a href="/api/ruby/pluck/">pluck</a>("user_id", "name")
 </pre>
 
         </td></tr>
@@ -128,30 +128,23 @@ WHERE name = "Peter"
 </pre>
         </td><td>
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>({
-    "name": "Peter"
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>({
+    :name => "Peter"
 })
 </pre>
 
-<p>An alternative is to use the implicit variable <code>r.row</code> (the currently visited document):</p>
+<p>An alternative is to use a block:</p>
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    r.<a href="/api/python/row/">row</a>["name"] <a href="/api/python/eq/">==</a> "Peter"
-)
-</pre>
-
-<p>Another alternative is to use an anonymous function:</p>
-<pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(lambda doc:
-    doc["name"] <a href="/api/python/eq/">==</a> "Peter"
-)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
+    doc["name"] <a href="/api/ruby/eq/">==</a> "Peter"
+}
 </pre>
 
 <p>If you have a secondary index built on the field <code>name</code>, you can run a
 more efficient query:
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/get_all/">get_all</a>("Peter", index="name")
+r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/get_all/">get_all</a>("Peter", {:index => "name"})
 </pre>
 
         </td></tr>
@@ -165,9 +158,9 @@ WHERE name = "Peter"
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>({
-    "name": "Peter"
-}).<a href="/api/python/pluck/">pluck</a>("user_id", "name")
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>({
+    :name => "Peter"
+}).<a href="/api/ruby/pluck/">pluck</a>("user_id", "name")
 </pre>
 
         </td></tr>
@@ -183,17 +176,10 @@ AND age = 30
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>({
-    "name": "Peter",
-    "age": 30
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>({
+    :name => "Peter",
+    :age => 30
 })
-</pre>
-
-<pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    (r.<a href="/api/python/row/">row</a>["name"] <a href="/api/python/eq/">==</a> "Peter")
-     <a href="/api/python/and/">&</a> (r.<a href="/api/python/row/">row</a>["age"] <a href="/api/python/eq/">==</a> 30)
-)
 </pre>
 
         </td></tr>
@@ -209,9 +195,9 @@ WHERE age &gt; 30
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    r.<a href="/api/python/row/">row</a>["age"] <a href="/api/python/gt/">&gt;</a> 30
-)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |row|
+    row['age'].<a href="/api/ruby/gt/">gt</a>(30)
+}
 </pre>
 
         </td></tr>
@@ -224,9 +210,9 @@ WHERE name LIKE "P%"
 
         </td><td>
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    r.<a href="/api/python/row/">row</a>['name'].<a href="/api/python/match/">match</a>("^P")
-)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |row|
+    row['name'].<a href="/api/ruby/match/">match</a>("^P")
+}
 </pre>
 
         </td></tr>
@@ -240,8 +226,8 @@ WHERE name LIKE "%er"
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    r.<a href="/api/python/row/">row</a>['name'].<a href="/api/python/match/">match</a>("er$")
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |row|
+    row['name'].<a href="/api/ruby/match/">match</a>("er$")}
 )
 </pre>
 
@@ -256,7 +242,7 @@ ORDER BY name ASC
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/order_by/">order_by</a>("name")
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/order_by/">order_by</a>("name")
 </pre>
 
         </td></tr>
@@ -271,7 +257,7 @@ ORDER BY name DESC
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/order_by/">order_by</a>(
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/order_by/">order_by</a>(
     r.desc("name")
 )
 </pre>
@@ -289,11 +275,11 @@ ORDER BY name DESC
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>({
-    "name": "Peter"
-}).<a href="/api/python/order_by/">order_by</a>(
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>({
+    :name => "Peter"
+}).<a href="/api/ruby/order_by/">order_by</a>(
     r.desc("name")
-).<a href="/api/python/pluck/">pluck</a>("user_id")
+).<a href="/api/ruby/pluck/">pluck</a>("user_id")
 </pre>
 
         </td></tr>
@@ -306,7 +292,7 @@ SELECT * FROM users LIMIT 5
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/limit/">limit</a>(5)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/limit/">limit</a>(5)
 </pre>
 
         </td></tr>
@@ -320,7 +306,7 @@ SELECT * FROM users LIMIT 5 SKIP 10
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/skip/">skip</a>(10).<a href="/api/python/limit/">limit</a>(5)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/skip/">skip</a>(10).<a href="/api/ruby/limit/">limit</a>(5)
 </pre>
 
         </td></tr>
@@ -335,17 +321,17 @@ WHERE name IN {'Peter', 'John'}
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(lambda doc:
-    r.<a href="/api/python/expr/"</a>expr</a>(["Peter", "John"])
-        .<a href="/api/python/contains">contains</a>(doc["name"])
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+    r.<a href="/api/ruby/expr/"</a>expr</a>(["Peter", "John"])
+        .<a href="/api/ruby/contains">contains</a>(doc["name"])
 )
 </pre>
 
 <p>If you have a secondary index built on the field <code>name</code>, you can run a
 more efficient query:
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/get_all/">get_all</a>("Peter", "John",
+r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/get_all/">get_all</a>("Peter", "John",
         index="name")
 </pre>
 
@@ -361,9 +347,9 @@ WHERE name NOT IN {'Peter', 'John'}
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(lambda doc:
-    r.<a href="/api/python/expr/"</a>expr</a>(["Peter", "John"])
-        .<a href="/api/python/contains/">contains</a>(doc["name"])
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+    r.<a href="/api/ruby/expr/"</a>expr</a>(["Peter", "John"])
+        .<a href="/api/ruby/contains/">contains</a>(doc["name"])
         .not()
 )
 </pre>
@@ -378,7 +364,7 @@ SELECT COUNT(*) FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/count/">count</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/count/">count</a>()
 </pre>
 
         </td></tr>
@@ -391,9 +377,9 @@ SELECT COUNT(name) FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(lambda doc:
-    doc.<a href="/api/python/has_fields/">has_fields</a>("name")
-).<a href="/api/python/count/">count</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+    doc.<a href="/api/ruby/has_fields/">has_fields</a>("name")
+).<a href="/api/ruby/count/">count</a>()
 </pre>
 
         </td></tr>
@@ -408,10 +394,10 @@ WHERE age &gt; 18
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    (r.<a href="/api/python/row/">row</a>.<a href="/api/python/has_fields/">has_fields</a>("name"))
-     <a href="/api/python/and/">&</a> (r.<a href="/api/python/row/">row</a>["age"] <a href="/api/python/gt/">&gt;</a> 18)
-).<a href="/api/python/count/">count</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
+    (r.<a href="/api/ruby/row/">row</a>.<a href="/api/ruby/has_fields/">has_fields</a>("name"))
+     <a href="/api/ruby/and/">&</a> (r.<a href="/api/ruby/row/">row</a>["age"] <a href="/api/ruby/gt/">&gt;</a> 18)
+).<a href="/api/ruby/count/">count</a>()
 </pre>
 
         </td></tr>
@@ -425,8 +411,8 @@ SELECT AVG("age")
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
- .<a href="/api/python/avg/">avg</a>("age")
+r.<a href="/api/ruby/table/">table</a>("users")
+ .<a href="/api/ruby/avg/">avg</a>("age")
 </pre>
 
         </td></tr>
@@ -441,8 +427,8 @@ SELECT MAX("age")
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")["age"]
- .<a href="/api/python/max/">max</a>()
+r.<a href="/api/ruby/table/">table</a>("users")["age"]
+ .<a href="/api/ruby/max/">max</a>()
 </pre>
 
         </td></tr>
@@ -457,8 +443,8 @@ SELECT MIN("age")
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")["age"]
- .<a href="/api/python/min/">min</a>()
+r.<a href="/api/ruby/table/">table</a>("users")["age"]
+ .<a href="/api/ruby/min/">min</a>()
 </pre>
 
         </td></tr>
@@ -472,8 +458,8 @@ SELECT SUM("num_posts")
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
- .<a href="/api/python/sum/">sum</a>("num_posts")
+r.<a href="/api/ruby/table/">table</a>("users")
+ .<a href="/api/ruby/sum/">sum</a>("num_posts")
 </pre>
 
         </td></tr>
@@ -486,7 +472,7 @@ SELECT DISTINCT(name) FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/pluck/">pluck</a>("name").<a href="/api/python/distinct/">distinct</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/pluck/">pluck</a>("name").<a href="/api/ruby/distinct/">distinct</a>()
 </pre>
 
         </td></tr>
@@ -501,16 +487,16 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    (r.row["age"] <a href="/api/python/ge/">>=</a> 18)
-    & (r.row["age"] <a href="/api/python/le/">>=</a> 65)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
+    (r.row["age"] <a href="/api/ruby/ge/">>=</a> 18)
+    & (r.row["age"] <a href="/api/ruby/le/">>=</a> 65)
 </pre>
 
 If you have a secondary index built on the field <code>age</code>, you can run a
 more efficient query:
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/between/">between</a>(18, 65, index="age")
+r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/between/">between</a>(18, 65, index="age")
 </pre>
 
         </td></tr>
@@ -528,21 +514,21 @@ FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/map/">map</a>({
-    "name": r.<a href="/api/python/row/">row</a>["name"],
-    "is_adult": r.<a href="/api/python/branch/">branch</a>(
-        r.<a href="/api/python/row/">row</a>["age"] <a href="/api/python/gt/">&gt;</a> 18,
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>({
+    :name => r.<a href="/api/ruby/row/">row</a>["name"],
+    :is_adult => r.<a href="/api/ruby/branch/">branch</a>(
+        r.<a href="/api/ruby/row/">row</a>["age"] <a href="/api/ruby/gt/">&gt;</a> 18,
         "yes",
         "no"
     )
 })
 </pre>
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/map/">map</a>(lambda user:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>(lambda user:
     {
-        "name": user["name"],
-        "is_adult": r.<a href="/api/python/branch/">branch</a>(
-            user["age"] <a href="/api/python/gt/">&gt;</a> 18
+        :name => user["name"],
+        :is_adult => r.<a href="/api/ruby/branch/">branch</a>(
+            user["age"] <a href="/api/ruby/gt/">&gt;</a> 18
             "yes",
             "no"
         )
@@ -567,12 +553,12 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts")
-  .<a href="/api/python/filter/">filter</a>(lambda post:
-    r.<a href="/api/python/table/">table</a>("users")
-      .<a href="/api/python/filter/">filter</a>( lambda user:
-        user.id <a href="/api/python/eq/">==</a> post.author_id
-      ).<a href="/api/python/count/">count</a>() <a href="/api/python/gt/">&gt;</a> 0
+r.<a href="/api/ruby/table/">table</a>("posts")
+  .<a href="/api/ruby/filter/">filter</a>(lambda post:
+    r.<a href="/api/ruby/table/">table</a>("users")
+      .<a href="/api/ruby/filter/">filter</a>( lambda user:
+        user.id <a href="/api/ruby/eq/">==</a> post.author_id
+      ).<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/gt/">&gt;</a> 0
     )
 </pre>
 
@@ -604,19 +590,19 @@ UPDATE users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(
-    r.<a href="/api/python/row/">row</a>["age"] < 18
-).<a href="/api/python/update/">update</a>({
-    "age": 18
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
+    r.<a href="/api/ruby/row/">row</a>["age"] < 18
+).<a href="/api/ruby/update/">update</a>({
+    :age => 18
 })
 </pre>
 
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
     doc["age"] < 18
-).<a href="/api/python/update/">update</a>({
-    "age": 18
+).<a href="/api/ruby/update/">update</a>({
+    :age => 18
 })
 </pre>
 
@@ -632,14 +618,14 @@ UPDATE users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/update/">update</a>(
-    { "age": r.<a href="/api/python/row/">row</a>["age"]+1 }
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/update/">update</a>(
+    { :age => r.<a href="/api/ruby/row/">row</a>["age"]+1 }
 )
 </pre>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/update/">update</a>(lambda doc:
-    { "age": doc["age"]+1 }
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/update/">update</a>(lambda doc:
+    { :age => doc["age"]+1 }
 )
 </pre>
 
@@ -664,7 +650,7 @@ DELETE FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/delete/">delete</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/delete/">delete</a>()
 </pre>
 
         </td></tr>
@@ -678,16 +664,16 @@ WHERE age &lt; 18
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/filter/">filter</a>( r.<a href="/api/python/row/">row</a>["age"] < 18)
-    .<a href="/api/python/delete/">delete</a>()
+r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/filter/">filter</a>( r.<a href="/api/ruby/row/">row</a>["age"] < 18)
+    .<a href="/api/ruby/delete/">delete</a>()
 </pre>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/filter/">filter</a>(lambda doc:
     doc["age"] < 18
-    ).<a href="/api/python/delete/">delete</a>()
+    ).<a href="/api/ruby/delete/">delete</a>()
 </pre>
 
         </td></tr>
@@ -717,22 +703,22 @@ ON posts.user_id = users.id
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/inner_join/">inner_join</a>(
-    r.<a href="/api/python/table/">table</a>("users"),
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/inner_join/">inner_join</a>(
+    r.<a href="/api/ruby/table/">table</a>("users"),
     lambda post, user:
-        post["user_id"] <a href="/api/python/eq/">==</a> user["id"]
-).<a href="/api/python/zip/">zip</a>()
+        post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
 <p><em>Note:</em> <code>zip()</code> will merge the user in the post, overwriting fields in case of conflict.</p>
 
-<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/python/eq_join/">eq_join</a></p>
+<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/ruby/eq_join/">eq_join</a></p>
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/eq_join/">eq_join</a>(
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/eq_join/">eq_join</a>(
     "id",
-    r.<a href="/api/python/table/">table</a>("users"),
+    r.<a href="/api/ruby/table/">table</a>("users"),
     index="id"
-).<a href="/api/python/zip/">zip</a>()
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
         </td></tr>
@@ -759,14 +745,14 @@ SELECT posts.id AS post_id,
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/inner_join/">inner_join</a>(
-  r.<a href="/api/python/table/">table</a>("users"),
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/inner_join/">inner_join</a>(
+  r.<a href="/api/ruby/table/">table</a>("users"),
   lambda post, user:
-    post["user_id"] <a href="/api/python/eq/">==</a> user["id"]
-).<a href="/api/python/map/">map</a>({
-  "post_id": r.<a href="/api/python/row/">row</a>["left"]["id"],
-  "user_id": r.<a href="/api/python/row/">row</a>["right"]["id"],
-  "name": r.<a href="/api/python/row/">row</a>["right"]["name"]
+    post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
+).<a href="/api/ruby/map/">map</a>({
+  :post_id => r.<a href="/api/ruby/row/">row</a>["left"]["id"],
+  :user_id => r.<a href="/api/ruby/row/">row</a>["right"]["id"],
+  :name => r.<a href="/api/ruby/row/">row</a>["right"]["name"]
 })
 </pre>
 
@@ -793,33 +779,33 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/outer_join/">outer_join</a>(
-    r.<a href="/api/python/table/">table</a>("users"),
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/outer_join/">outer_join</a>(
+    r.<a href="/api/ruby/table/">table</a>("users"),
     lambda post, user:
-        post["user_id"] <a href="/api/python/eq/">==</a> user["id"]
-).<a href="/api/python/zip/">zip</a>()
+        post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
-<p><em>Note</em>: You can perform efficient <code>OUTER JOIN</code> operations with the <a href="/api/python/concat_map/">concat_map</a> command.<br/>
+<p><em>Note</em>: You can perform efficient <code>OUTER JOIN</code> operations with the <a href="/api/ruby/concat_map/">concat_map</a> command.<br/>
 The <code>eq_join</code> command will eventually be able to behave like an OUTER JOIn, see <a href="https://github.com/rethinkdb/rethinkdb/issues/1223">this github issue</a>.
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/concat_map/">concat_map</a>(lambda post:
-  r.<a href="/api/python/table/">table</a>("users")
-    .<a href="/api/python/get_all/">get_all</a>(post["id"],index="id")
-    .<a href="/api/python/do/">do</a>( lambda results:
-      r.<a href="/api/python/branch/">branch</a>(
-        results.<a href="/api/python/count/">count</a>() <a href="/api/python/eq/">==</a> 0,
-        [{"left": post}],
-        results.<a href="/api/python/map/">map</a>( lambda user:
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/concat_map/">concat_map</a>(lambda post:
+  r.<a href="/api/ruby/table/">table</a>("users")
+    .<a href="/api/ruby/get_all/">get_all</a>(post["id"],index="id")
+    .<a href="/api/ruby/do/">do</a>( lambda results:
+      r.<a href="/api/ruby/branch/">branch</a>(
+        results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
+        [{:left => post}],
+        results.<a href="/api/ruby/map/">map</a>( lambda user:
           {
-            "left": post
-            "right": user
+            :left => post
+            :right => user
           }
         )
       )
     )
-).<a href="/api/python/zip/">zip</a>()
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
         </td></tr>
@@ -842,30 +828,30 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/outer_join/">outer_join</a>(
-    r.<a href="/api/python/table/">table</a>("posts"),
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/outer_join/">outer_join</a>(
+    r.<a href="/api/ruby/table/">table</a>("posts"),
     lambda user, post:
-        post.user_id <a href="/api/python/eq/">==</a> user.id
-).<a href="/api/python/zip/">zip</a>()
+        post.user_id <a href="/api/ruby/eq/">==</a> user.id
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/concat_map/">concat_map</a>(lambda user:
-  r.<a href="/api/python/table/">table</a>("posts")
-    .<a href="/api/python/get_all/">get_all</a>(user["id"],index="id")
-    .<a href="/api/python/do/">do</a>( lambda results:
-      r.<a href="/api/python/branch/">branch</a>(
-        results.<a href="/api/python/count/">count</a>() <a href="/api/python/eq/">==</a> 0,
-        [{"left": user}],
-        results.<a href="/api/python/map/">map</a>( lambda post:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/concat_map/">concat_map</a>(lambda user:
+  r.<a href="/api/ruby/table/">table</a>("posts")
+    .<a href="/api/ruby/get_all/">get_all</a>(user["id"],index="id")
+    .<a href="/api/ruby/do/">do</a>( lambda results:
+      r.<a href="/api/ruby/branch/">branch</a>(
+        results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
+        [{:left => user}],
+        results.<a href="/api/ruby/map/">map</a>( lambda post:
           {
-            "left": user
-            "right": post
+            :left => user
+            :right => post
           }
         )
       )
     )
-).<a href="/api/python/zip/">zip</a>()
+).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
         </td></tr>
@@ -892,15 +878,15 @@ SELECT category
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/map/">map</a>(
-    r.<a href="/api/python/row/">row</a>["category"]
-).<a href="/api/python/distinct/">distinct</a>()
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/map/">map</a>(
+    r.<a href="/api/ruby/row/">row</a>["category"]
+).<a href="/api/ruby/distinct/">distinct</a>()
 </pre>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/map/">map</a>(lambda user:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>(lambda user:
     user["category"]
-).<a href="/api/python/distinct/">distinct</a>()
+).<a href="/api/ruby/distinct/">distinct</a>()
 </pre>
 
         </td></tr>
@@ -916,9 +902,9 @@ SELECT category,
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>('posts')
- .<a href="/api/python/group/">group</a>('category')
- .<a href="/api/python/sum/">sum</a>('num_comments')
+r.<a href="/api/ruby/table/">table</a>('posts')
+ .<a href="/api/ruby/group/">group</a>('category')
+ .<a href="/api/ruby/sum/">sum</a>('num_comments')
 </pre>
 
         </td></tr>
@@ -936,9 +922,9 @@ SELECT category,
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts")
- .<a href="/api/python/group/">group</a>('category', 'status')
- .<a href="/api/python/sum/">sum</a>('num_comments')
+r.<a href="/api/ruby/table/">table</a>("posts")
+ .<a href="/api/ruby/group/">group</a>('category', 'status')
+ .<a href="/api/ruby/sum/">sum</a>('num_comments')
 </pre>
         </td></tr>
 
@@ -956,10 +942,10 @@ SELECT category,
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts")
- .<a href="/api/python/filter/">filter</a>(r.row['num_comments']>7)
- .<a href="/api/python/group/">group</a>('category')
- .<a href="/api/python/sum/">sum</a>('num_comments')
+r.<a href="/api/ruby/table/">table</a>("posts")
+ .<a href="/api/ruby/filter/">filter</a>(r.row['num_comments']>7)
+ .<a href="/api/ruby/group/">group</a>('category')
+ .<a href="/api/ruby/sum/">sum</a>('num_comments')
 </pre>
 
         </td></tr>
@@ -978,10 +964,10 @@ SELECT category,
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("posts")
- .<a href="/api/python/group/">group</a>('category')
- .<a href="/api/python/sum/">sum</a>('num_comments')
- .<a href="/api/python/filter/">filter</a>(r.row>7)
+r.<a href="/api/ruby/table/">table</a>("posts")
+ .<a href="/api/ruby/group/">group</a>('category')
+ .<a href="/api/ruby/sum/">sum</a>('num_comments')
+ .<a href="/api/ruby/filter/">filter</a>(r.row>7)
 </pre>
 
         </td></tr>
@@ -1007,7 +993,7 @@ CREATE DATABASE my_database;
         </td><td>
 
 <pre>
-r.<a href="/api/python/db_create/">db_create</a>('my_database')
+r.<a href="/api/ruby/db_create/">db_create</a>('my_database')
 </pre>
 
         </td></tr>
@@ -1021,7 +1007,7 @@ DROP DATABASE my_database;
         </td><td>
 
 <pre>
-r.<a href="/api/python/db_drop/">db_drop</a>('my_database')
+r.<a href="/api/ruby/db_drop/">db_drop</a>('my_database')
 </pre>
 
         </td></tr>
@@ -1040,7 +1026,7 @@ CREATE TABLE users
         </td><td>
 
 <pre>
-r.<a href="/api/python/table_create/">table_create</a>('users', primary_key="id")
+r.<a href="/api/ruby/table_create/">table_create</a>('users', primary_key="id")
 </pre>
 <p><em>Note:</em> RethinkDB is a NoSQL database and does not enforce
 schemas.</p>
@@ -1061,7 +1047,7 @@ TRUNCATE TABLE users;
         </td><td>
 
 <pre>
-r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/delete/">delete</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/delete/">delete</a>()
 </pre>
 
 
@@ -1077,7 +1063,7 @@ DROP TABLE users;
         </td><td>
 
 <pre>
-r.<a href="/api/python/table_drop/">table_drop</a>("users")
+r.<a href="/api/ruby/table_drop/">table_drop</a>("users")
 </pre>
 
         </td></tr>
