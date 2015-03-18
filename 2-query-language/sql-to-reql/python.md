@@ -727,7 +727,7 @@ r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/inner_joi
 
 <p><em>Note:</em> <code>zip()</code> will merge the user in the post, overwriting fields in case of conflict.</p>
 
-<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/python/eq_join/">eq_join</a></p>
+<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/python/eq_join/">eq_join</a>.</p>
 <pre>
 r.<a href="/api/python/table/">table</a>("posts").<a href="/api/python/eq_join/">eq_join</a>(
     "id",

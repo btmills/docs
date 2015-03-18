@@ -3,9 +3,9 @@ layout: documentation
 title: SQL to ReQL cheat sheet
 active: docs
 docs_active: sql-to-reql
-permalink: docs/sql-to-reql/python/
+permalink: docs/sql-to-reql/ruby/
 switcher: true
-language: Python
+language: Ruby
 ---
 
 <img alt="Data Modeling Illustration" class="api_command_illustration"
@@ -144,7 +144,7 @@ r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filt
 more efficient query:
 <pre>
 r.<a href="/api/ruby/table/">table</a>("users")
-    .<a href="/api/ruby/get_all/">get_all</a>("Peter", {:index => "name"})
+    .<a href="/api/ruby/get_all/">get_all</a>("Peter", :index => "name")
 </pre>
 
         </td></tr>
@@ -315,16 +315,16 @@ r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/skip/">skip</
 
 <pre>
 SELECT * FROM users
-WHERE name IN {'Peter', 'John'}
+WHERE name IN ('Peter', 'John')
 </pre>
 
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
     r.<a href="/api/ruby/expr/"</a>expr</a>(["Peter", "John"])
         .<a href="/api/ruby/contains">contains</a>(doc["name"])
-)
+}
 </pre>
 
 <p>If you have a secondary index built on the field <code>name</code>, you can run a
@@ -332,7 +332,7 @@ more efficient query:
 <pre>
 r.<a href="/api/ruby/table/">table</a>("users")
     .<a href="/api/ruby/get_all/">get_all</a>("Peter", "John",
-        index="name")
+        :index => "name")
 </pre>
 
         </td></tr>
@@ -341,17 +341,17 @@ r.<a href="/api/ruby/table/">table</a>("users")
 
 <pre>
 SELECT * FROM users
-WHERE name NOT IN {'Peter', 'John'}
+WHERE name NOT IN ('Peter', 'John')
 </pre>
 
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
     r.<a href="/api/ruby/expr/"</a>expr</a>(["Peter", "John"])
         .<a href="/api/ruby/contains/">contains</a>(doc["name"])
         .not()
-)
+}
 </pre>
 
         </td></tr>
@@ -377,9 +377,9 @@ SELECT COUNT(name) FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
     doc.<a href="/api/ruby/has_fields/">has_fields</a>("name")
-).<a href="/api/ruby/count/">count</a>()
+}.<a href="/api/ruby/count/">count</a>()
 </pre>
 
         </td></tr>
@@ -394,10 +394,9 @@ WHERE age &gt; 18
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
-    (r.<a href="/api/ruby/row/">row</a>.<a href="/api/ruby/has_fields/">has_fields</a>("name"))
-     <a href="/api/ruby/and/">&</a> (r.<a href="/api/ruby/row/">row</a>["age"] <a href="/api/ruby/gt/">&gt;</a> 18)
-).<a href="/api/ruby/count/">count</a>()
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
+    (doc.<a href="/api/ruby/has_fields/">has_fields</a>("name") & doc["age"] <a href="/api/ruby/gt/">></a> 18)
+}.<a href="/api/ruby/count/">count</a>()
 </pre>
 
         </td></tr>
@@ -487,16 +486,16 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
-    (r.row["age"] <a href="/api/ruby/ge/">>=</a> 18)
-    & (r.row["age"] <a href="/api/ruby/le/">>=</a> 65)
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
+    (doc["age"] <a href="/api/ruby/ge/">>=</a> 18) & (doc["age"] <a href="/api/ruby/le/"><=</a> 65)
+}
 </pre>
 
 If you have a secondary index built on the field <code>age</code>, you can run a
 more efficient query:
 <pre>
 r.<a href="/api/ruby/table/">table</a>("users")
-    .<a href="/api/ruby/between/">between</a>(18, 65, index="age")
+    .<a href="/api/ruby/between/">between</a>(18, 65, :index => "age")
 </pre>
 
         </td></tr>
@@ -514,17 +513,7 @@ FROM users
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>({
-    :name => r.<a href="/api/ruby/row/">row</a>["name"],
-    :is_adult => r.<a href="/api/ruby/branch/">branch</a>(
-        r.<a href="/api/ruby/row/">row</a>["age"] <a href="/api/ruby/gt/">&gt;</a> 18,
-        "yes",
-        "no"
-    )
-})
-</pre>
-<pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>(lambda user:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>{ |user|
     {
         :name => user["name"],
         :is_adult => r.<a href="/api/ruby/branch/">branch</a>(
@@ -533,7 +522,7 @@ r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>
             "no"
         )
     }
-)
+}
 </pre>
 
         </td></tr>
@@ -554,12 +543,12 @@ SELECT *
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("posts")
-  .<a href="/api/ruby/filter/">filter</a>(lambda post:
+  .<a href="/api/ruby/filter/">filter</a>{ |post|
     r.<a href="/api/ruby/table/">table</a>("users")
-      .<a href="/api/ruby/filter/">filter</a>( lambda user:
+      .<a href="/api/ruby/filter/">filter</a>{ |user|
         user.id <a href="/api/ruby/eq/">==</a> post.author_id
-      ).<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/gt/">&gt;</a> 0
-    )
+      }.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/gt/">&gt;</a> 0
+    }
 </pre>
 
         </td></tr>
@@ -590,18 +579,9 @@ UPDATE users
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(
-    r.<a href="/api/ruby/row/">row</a>["age"] < 18
-).<a href="/api/ruby/update/">update</a>({
-    :age => 18
-})
-</pre>
-
-
-<pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
     doc["age"] < 18
-).<a href="/api/ruby/update/">update</a>({
+}.<a href="/api/ruby/update/">update</a>({
     :age => 18
 })
 </pre>
@@ -617,16 +597,11 @@ UPDATE users
 
         </td><td>
 
-<pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/update/">update</a>(
-    { :age => r.<a href="/api/ruby/row/">row</a>["age"]+1 }
-)
-</pre>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/update/">update</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/update/">update</a>{ |doc|
     { :age => doc["age"]+1 }
-)
+}
 </pre>
 
         </td></tr>
@@ -664,16 +639,9 @@ WHERE age &lt; 18
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users")
-    .<a href="/api/ruby/filter/">filter</a>( r.<a href="/api/ruby/row/">row</a>["age"] < 18)
-    .<a href="/api/ruby/delete/">delete</a>()
-</pre>
-
-<pre>
-r.<a href="/api/ruby/table/">table</a>("users")
-    .<a href="/api/ruby/filter/">filter</a>(lambda doc:
+r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |doc|
     doc["age"] < 18
-    ).<a href="/api/ruby/delete/">delete</a>()
+}.<a href="/api/ruby/delete/">delete</a>()
 </pre>
 
         </td></tr>
@@ -704,20 +672,20 @@ ON posts.user_id = users.id
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/inner_join/">inner_join</a>(
-    r.<a href="/api/ruby/table/">table</a>("users"),
-    lambda post, user:
-        post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
-).<a href="/api/ruby/zip/">zip</a>()
+    r.<a href="/api/ruby/table/">table</a>("users")
+) { |post, user|
+    post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
+}.zip()
 </pre>
 
 <p><em>Note:</em> <code>zip()</code> will merge the user in the post, overwriting fields in case of conflict.</p>
 
-<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/ruby/eq_join/">eq_join</a></p>
+<p>If you have an index (primary key or secondary index) built on the field of the right table, you can perform a more efficient join with <a href="/api/ruby/eq_join/">eq_join</a>.</p>
+
 <pre>
-r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/eq_join/">eq_join</a>(
-    "id",
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/eq_join/">eq_join</a>("id",
     r.<a href="/api/ruby/table/">table</a>("users"),
-    index="id"
+    :index => "id"
 ).<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
@@ -746,14 +714,14 @@ SELECT posts.id AS post_id,
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/inner_join/">inner_join</a>(
-  r.<a href="/api/ruby/table/">table</a>("users"),
-  lambda post, user:
+  r.<a href="/api/ruby/table/">table</a>("users")
+) { |post, user|
     post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
-).<a href="/api/ruby/map/">map</a>({
-  :post_id => r.<a href="/api/ruby/row/">row</a>["left"]["id"],
-  :user_id => r.<a href="/api/ruby/row/">row</a>["right"]["id"],
-  :name => r.<a href="/api/ruby/row/">row</a>["right"]["name"]
-})
+}.<a href="/api/ruby/map/">map</a> { |post, user|
+  :post_id => post["id"],
+  :user_id => user["id"],
+  :name => user["name"]
+}
 </pre>
 
 
@@ -780,32 +748,26 @@ SELECT *
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/outer_join/">outer_join</a>(
-    r.<a href="/api/ruby/table/">table</a>("users"),
-    lambda post, user:
+    r.<a href="/api/ruby/table/">table</a>("users")
+) { |post, user|
         post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
-).<a href="/api/ruby/zip/">zip</a>()
+}.<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
-<p><em>Note</em>: You can perform efficient <code>OUTER JOIN</code> operations with the <a href="/api/ruby/concat_map/">concat_map</a> command.<br/>
-The <code>eq_join</code> command will eventually be able to behave like an OUTER JOIn, see <a href="https://github.com/rethinkdb/rethinkdb/issues/1223">this github issue</a>.
+<p><em>Note</em>: You can perform more efficient <code>OUTER JOIN</code> operations with the <a href="/api/javascript/concat_map/">concatMap</a> command.</p>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/concat_map/">concat_map</a>(lambda post:
-  r.<a href="/api/ruby/table/">table</a>("users")
-    .<a href="/api/ruby/get_all/">get_all</a>(post["id"],index="id")
-    .<a href="/api/ruby/do/">do</a>( lambda results:
-      r.<a href="/api/ruby/branch/">branch</a>(
-        results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
-        [{:left => post}],
-        results.<a href="/api/ruby/map/">map</a>( lambda user:
-          {
-            :left => post
-            :right => user
-          }
-        )
-      )
-    )
-).<a href="/api/ruby/zip/">zip</a>()
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/concat_map/">concat_map</a>{ |post|
+  r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/get_all/">get_all</a>(
+    post["id"], :index => "id"
+  ).<a href="/api/ruby/do/">do</a>{ |results| r.branch(
+    results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
+    [{:left => post}],
+    results.<a href="/api/ruby/map/">map</a> { |user|
+      {:left => post, :right => user}
+    }
+  )}
+}.zip()
 </pre>
 
         </td></tr>
@@ -828,30 +790,25 @@ SELECT *
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/outer_join/">outer_join</a>(
-    r.<a href="/api/ruby/table/">table</a>("posts"),
-    lambda user, post:
-        post.user_id <a href="/api/ruby/eq/">==</a> user.id
-).<a href="/api/ruby/zip/">zip</a>()
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/outer_join/">outer_join</a>(
+    r.<a href="/api/ruby/table/">table</a>("users")
+) { |user, post|
+        post["user_id"] <a href="/api/ruby/eq/">==</a> user["id"]
+}.<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/concat_map/">concat_map</a>(lambda user:
-  r.<a href="/api/ruby/table/">table</a>("posts")
-    .<a href="/api/ruby/get_all/">get_all</a>(user["id"],index="id")
-    .<a href="/api/ruby/do/">do</a>( lambda results:
-      r.<a href="/api/ruby/branch/">branch</a>(
-        results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
-        [{:left => user}],
-        results.<a href="/api/ruby/map/">map</a>( lambda post:
-          {
-            :left => user
-            :right => post
-          }
-        )
-      )
-    )
-).<a href="/api/ruby/zip/">zip</a>()
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/concat_map/">concat_map</a>{ |post|
+  r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/get_all/">get_all</a>(
+    post["id"], :index => "id"
+  ).<a href="/api/ruby/do/">do</a>{ |results| r.branch(
+    results.<a href="/api/ruby/count/">count</a>() <a href="/api/ruby/eq/">==</a> 0,
+    [{:left => user}],
+    results.<a href="/api/ruby/map/">map</a> { |post|
+      {:left => user, :right => post}
+    }
+  )}
+}.zip()
 </pre>
 
         </td></tr>
@@ -942,10 +899,10 @@ SELECT category,
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("posts")
- .<a href="/api/ruby/filter/">filter</a>(r.row['num_comments']>7)
- .<a href="/api/ruby/group/">group</a>('category')
- .<a href="/api/ruby/sum/">sum</a>('num_comments')
+r.table("posts").filter{ |doc|
+    doc['num_comments'] > 7
+}.group('category')
+ .sum('num_comments')
 </pre>
 
         </td></tr>
@@ -967,7 +924,7 @@ SELECT category,
 r.<a href="/api/ruby/table/">table</a>("posts")
  .<a href="/api/ruby/group/">group</a>('category')
  .<a href="/api/ruby/sum/">sum</a>('num_comments')
- .<a href="/api/ruby/filter/">filter</a>(r.row>7)
+ .<a href="/api/ruby/filter/">filter</a>{ |val| val > 7 }
 </pre>
 
         </td></tr>
@@ -1026,7 +983,8 @@ CREATE TABLE users
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table_create/">table_create</a>('users', primary_key="id")
+r.<a href="/api/ruby/table_create/">table_create</a>('users',
+    :primary_key => "id")
 </pre>
 <p><em>Note:</em> RethinkDB is a NoSQL database and does not enforce
 schemas.</p>
