@@ -330,7 +330,7 @@ r.<a href="/api/python/table/">table</a>("users").<a href="/api/python/skip/">sk
 
 <pre>
 SELECT * FROM users
-WHERE name IN {'Peter', 'John'}
+WHERE name IN ('Peter', 'John')
 </pre>
 
         </td><td>
@@ -356,7 +356,7 @@ r.<a href="/api/python/table/">table</a>("users")
 
 <pre>
 SELECT * FROM users
-WHERE name NOT IN {'Peter', 'John'}
+WHERE name NOT IN ('Peter', 'John')
 </pre>
 
         </td><td>

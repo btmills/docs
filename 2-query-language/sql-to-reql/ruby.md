@@ -196,7 +196,7 @@ WHERE age &gt; 30
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/filter/">filter</a>{ |row|
-    row['age'].<a href="/api/ruby/gt/">gt</a>(30)
+    row['age'] <a href="/api/ruby/gt/">&gt;</a>(30)
 }
 </pre>
 
@@ -754,7 +754,7 @@ r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/outer_join/">
 }.<a href="/api/ruby/zip/">zip</a>()
 </pre>
 
-<p><em>Note</em>: You can perform more efficient <code>OUTER JOIN</code> operations with the <a href="/api/javascript/concat_map/">concatMap</a> command.</p>
+<p><em>Note</em>: You can perform more efficient <code>OUTER JOIN</code> operations with the <a href="/api/ruby/concat_map/">concat_map</a> command.</p>
 
 <pre>
 r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/concat_map/">concat_map</a>{ |post|
@@ -835,15 +835,9 @@ SELECT category
         </td><td>
 
 <pre>
-r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/map/">map</a>(
-    r.<a href="/api/ruby/row/">row</a>["category"]
-).<a href="/api/ruby/distinct/">distinct</a>()
-</pre>
-
-<pre>
-r.<a href="/api/ruby/table/">table</a>("users").<a href="/api/ruby/map/">map</a>(lambda user:
-    user["category"]
-).<a href="/api/ruby/distinct/">distinct</a>()
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/map/">map</a>{ |doc|
+    doc["category"]
+}.<a href="/api/ruby/distinct/">distinct</a>()
 </pre>
 
         </td></tr>
@@ -899,10 +893,10 @@ SELECT category,
         </td><td>
 
 <pre>
-r.table("posts").filter{ |doc|
+r.<a href="/api/ruby/table/">table</a>("posts").<a href="/api/ruby/filter/">filter</a>{ |doc|
     doc['num_comments'] > 7
-}.group('category')
- .sum('num_comments')
+}.<a href="/api/ruby/group/">group</a>('category')
+ .<a href="/api/ruby/sum/">sum</a>('num_comments')
 </pre>
 
         </td></tr>

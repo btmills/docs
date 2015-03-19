@@ -330,7 +330,7 @@ r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/s
 
 <pre>
 SELECT * FROM users
-WHERE name IN {'Peter', 'John'}
+WHERE name IN ('Peter', 'John')
 </pre>
 
         </td><td>
@@ -358,7 +358,7 @@ r.<a href="/api/javascript/table/">table</a>("users")
 
 <pre>
 SELECT * FROM users
-WHERE name NOT IN {'Peter', 'John'}
+WHERE name NOT IN ('Peter', 'John')
 </pre>
 
         </td><td>
@@ -414,8 +414,8 @@ WHERE age &gt; 18
 
 <pre>
 r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/filter/">filter</a>(
-    (r.<a href="/api/javascript/row/">row</a>.<a href="/api/javascript/has_fields/">has_fields</a>("name"))
-     <a href="/api/javascript/and/">&</a> (r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/gt/">gt</a>(18))
+    r.<a href="/api/javascript/row/">row</a>.<a href="/api/javascript/hasFields/">hasFields</a>("name")
+    .<a href="/api/javascript/and/">and</a>(r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/gt/">gt</a>(18))
 ).<a href="/api/javascript/count/">count</a>()
 </pre>
 
@@ -504,8 +504,9 @@ SELECT *
 
 <pre>
 r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/filter/">filter</a>(
-    (r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/ge/">ge</a>(18))
-    & (r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/le/">le</a>(65))
+    r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/ge/">ge</a>(18)
+     .<a href="/api/javascript/and/">and</a>(r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/le/">le</a>(65))
+).<a href="/api/javascript/count/">count</a>()
 </pre>
 
 If you have a secondary index built on the field <code>age</code>, you can run a
@@ -531,8 +532,8 @@ FROM users
 
 <pre>
 r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/map/">map</a>({
-    "name": r.<a href="/api/javascript/row/">row</a>("name"),
-    "is_adult": r.<a href="/api/javascript/branch/">branch</a>(
+    name: r.<a href="/api/javascript/row/">row</a>("name"),
+    is_adult: r.<a href="/api/javascript/branch/">branch</a>(
         r.<a href="/api/javascript/row/">row</a>("age").<a href="/api/javascript/gt/">gt</a>(18),
         "yes",
         "no"
@@ -634,13 +635,15 @@ UPDATE users
 
 <pre>
 r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/update/">update</a>(
-    { "age": r.<a href="/api/javascript/row/">row</a>("age").add(1) }
+    {age: r.<a href="/api/javascript/row/">row</a>("age").add(1)}
 )
 </pre>
 
 <pre>
-r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/update/">update</a>(lambda doc:
-    { "age": doc("age").add(1) }
+r.<a href="/api/javascript/table/">table</a>("users").<a href="/api/javascript/update/">update</a>(
+    function (doc) {
+        return {age: doc("age").add(1)};
+    }
 )
 </pre>
 
@@ -806,16 +809,16 @@ r.<a href="/api/javascript/table/">table</a>("posts").<a href="/api/javascript/o
 <p><em>Note</em>: You can perform more efficient <code>OUTER JOIN</code> operations with the <a href="/api/javascript/concat_map/">concatMap</a> command.</p>
 
 <pre>
-r.<a href="/api/javascript/table/">table</a>("posts").<a href="/api/javascript/concat_map/">concat_map</a>(
+r.<a href="/api/javascript/table/">table</a>("posts").<a href="/api/javascript/concat_map/">concatMap</a>(
   function (post) {
     return r.<a href="/api/javascript/table/">table</a>("users")
     .<a href="/api/javascript/get_all/">getAll</a>(post("id"), {index: id})
     .<a href="/api/javascript/do/">do</a>(
-      function (res) {
+      function (result) {
         return r.<a href="/api/javascript/branch/">branch</a>(
-          res.<a href="/api/javascript/count/">count</a>().eq(0),
+          result.<a href="/api/javascript/count/">count</a>().eq(0),
           [{left: post}],
-          res.<a href="/api/javascript/map/">map</a>(function (user) {
+          result.<a href="/api/javascript/map/">map</a>(function (user) {
             return {
               left: post, right: user
             };
